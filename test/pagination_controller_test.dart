@@ -13,14 +13,14 @@ List<TemplateData> _testDataList =
 
 void main() {
   group('pagination tests', () {
-    late PaginationController<TemplateData, OffsetPagination, String>
+    late CubitPaginationController<TemplateData, OffsetPagination, String>
         controller;
     const firstPagePointer = OffsetPagination(offset: 0);
     setUp(() {
-      controller = PaginationController(
+      controller = CubitPaginationController(
         firstPagePointer: firstPagePointer,
         loadFirstPageOnInit: false,
-        getPageFunc: (pagination) {
+        getPageFunc: (pagination) async {
           return SuccessPaginationResult(
             itemList: _testDataList
                 .skip(pagination.offset)
@@ -36,7 +36,7 @@ void main() {
       build: () => controller,
       act: (bloc) => bloc.getFirstPage(),
       expect: () => <dynamic>[
-        isA<DataListPCState<TemplateData, OffsetPagination>>()
+        isA<DataListPCState<TemplateData, OffsetPagination, String>>()
             .having((s) => s.isLastItems, 'isLastPage', false)
             .having((s) => s.itemList.length, 'itemList.length',
                 firstPagePointer.limit),
@@ -51,7 +51,7 @@ void main() {
       },
       skip: 1,
       expect: () => <dynamic>[
-        isA<DataListPCState<TemplateData, OffsetPagination>>()
+        isA<DataListPCState<TemplateData, OffsetPagination, String>>()
             .having((s) => s.isLastItems, 'isLastPage', false)
             .having((s) => s.itemList.length, 'itemList.length',
                 firstPagePointer.limit * 2)

@@ -1,4 +1,4 @@
-import 'package:pagination_controller/src/controller/pagination_method.dart';
+import 'package:pagination_controller/src/base/pagination_method.dart';
 
 sealed class PaginationResult<ItemType, PM extends PaginationMethod,
     ErrorType> {}
@@ -18,7 +18,11 @@ class SuccessPaginationResult<ItemType, PM extends PaginationMethod, ErrorType>
 
 class ErrorPaginationResult<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationResult<ItemType, PM, ErrorType> {
+  final PM pagination;
   final ErrorType? data;
 
-  const ErrorPaginationResult([this.data]);
+  const ErrorPaginationResult({
+    required this.pagination,
+    this.data,
+  });
 }

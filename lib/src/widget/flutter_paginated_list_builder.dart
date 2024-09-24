@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pagination_controller/pagination_controller.dart';
+import 'package:flutter/widgets.dart';
+import 'package:pagination_controller/src/base/pagination_controller_base.dart';
+import 'package:pagination_controller/src/controller/flutter_pagination_controller.dart';
 
-class PaginatedDataBuilderDevided<ItemType, PM extends PaginationMethod,
+class FlutterPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
     ErrorType> extends StatelessWidget {
-  final CubitPaginationController<ItemType, PM, ErrorType>? controller;
+  final FlutterPaginationController<ItemType, PM, ErrorType> controller;
   final Widget Function(
       BuildContext context,
       DataListPCState<ItemType, PM, ErrorType> dataState,
@@ -18,9 +18,9 @@ class PaginatedDataBuilderDevided<ItemType, PM extends PaginationMethod,
       ErrorListPCState<ItemType, PM, ErrorType> errorState,
       bool isProcessing) errorBuilder;
 
-  const PaginatedDataBuilderDevided({
+  const FlutterPaginatedListBuilderDevided({
     super.key,
-    this.controller,
+    required this.controller,
     required this.dataBuilder,
     required this.emptyBuilder,
     required this.errorBuilder,
@@ -28,7 +28,7 @@ class PaginatedDataBuilderDevided<ItemType, PM extends PaginationMethod,
 
   @override
   Widget build(BuildContext context) {
-    return PaginatedDataBuilder(
+    return FlutterPaginatedListBuilder(
       controller: controller,
       builder: (context, state, isProcessing) => switch (state) {
         DataListPCState<ItemType, PM, ErrorType>() =>
@@ -42,31 +42,28 @@ class PaginatedDataBuilderDevided<ItemType, PM extends PaginationMethod,
   }
 }
 
-class PaginatedDataBuilder<ItemType, PM extends PaginationMethod, ErrorType>
-    extends StatelessWidget {
-  final CubitPaginationController<ItemType, PM, ErrorType>? controller;
+class FlutterPaginatedListBuilder<ItemType, PM extends PaginationMethod,
+    ErrorType> extends StatelessWidget {
+  final FlutterPaginationController<ItemType, PM, ErrorType> controller;
   final Widget Function(
       BuildContext context,
       PaginationControllerState<ItemType, PM, ErrorType> state,
       bool isProcessing) builder;
 
-  const PaginatedDataBuilder({
+  const FlutterPaginatedListBuilder({
     super.key,
-    this.controller,
+    required this.controller,
     required this.builder,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = this.controller ??
-        context.read<CubitPaginationController<ItemType, PM, ErrorType>>();
     return ValueListenableBuilder(
       valueListenable: controller.isProcessing,
-      builder: (context, isProcessing, _) => BlocBuilder<
-          CubitPaginationController<ItemType, PM, ErrorType>,
-          PaginationControllerState<ItemType, PM, ErrorType>>(
-        bloc: controller,
-        builder: (context, state) => builder(context, state, isProcessing),
+      builder: (context, isProcessing, _) => ListenableBuilder(
+        listenable: controller,
+        builder: (context, _) =>
+            builder(context, controller.state, isProcessing),
       ),
     );
   }

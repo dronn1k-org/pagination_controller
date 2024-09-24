@@ -24,7 +24,7 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   final controller =
-      PaginationController<TemplateData, OffsetPagination, String>(
+      CubitPaginationController<TemplateData, OffsetPagination, String>(
     firstPagePointer: const OffsetPagination(offset: 0),
     getPageFunc: (pagination) {
       return Future.delayed(
