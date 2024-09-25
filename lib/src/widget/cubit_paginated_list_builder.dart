@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pagination_controller/pagination_controller.dart';
 
-class CubitPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
+class CubitPaginatedListBuilder<ItemType, PM extends PaginationMethod,
     ErrorType> extends StatelessWidget {
   final CubitPaginationController<ItemType, PM, ErrorType>? controller;
   final Widget Function(
@@ -18,7 +18,7 @@ class CubitPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
       ErrorListPCState<ItemType, PM, ErrorType> errorState,
       bool isProcessing) errorBuilder;
 
-  const CubitPaginatedListBuilderDevided({
+  const CubitPaginatedListBuilder({
     super.key,
     this.controller,
     required this.dataBuilder,
@@ -28,7 +28,7 @@ class CubitPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
 
   @override
   Widget build(BuildContext context) {
-    return CubitPaginatedListBuilder(
+    return _CubitPaginatedListBuilder(
       controller: controller,
       builder: (context, state, isProcessing) => switch (state) {
         DataListPCState<ItemType, PM, ErrorType>() =>
@@ -42,7 +42,7 @@ class CubitPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
   }
 }
 
-class CubitPaginatedListBuilder<ItemType, PM extends PaginationMethod,
+class _CubitPaginatedListBuilder<ItemType, PM extends PaginationMethod,
     ErrorType> extends StatelessWidget {
   final CubitPaginationController<ItemType, PM, ErrorType>? controller;
   final Widget Function(
@@ -50,7 +50,7 @@ class CubitPaginatedListBuilder<ItemType, PM extends PaginationMethod,
       PaginationControllerState<ItemType, PM, ErrorType> state,
       bool isProcessing) builder;
 
-  const CubitPaginatedListBuilder({
+  const _CubitPaginatedListBuilder({
     super.key,
     this.controller,
     required this.builder,

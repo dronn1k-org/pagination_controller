@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:pagination_controller/src/base/pagination_controller_base.dart';
 import 'package:pagination_controller/src/controller/flutter_pagination_controller.dart';
 
-class FlutterPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
+class FlutterPaginatedListBuilder<ItemType, PM extends PaginationMethod,
     ErrorType> extends StatelessWidget {
   final FlutterPaginationController<ItemType, PM, ErrorType> controller;
   final Widget Function(
@@ -18,7 +18,7 @@ class FlutterPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
       ErrorListPCState<ItemType, PM, ErrorType> errorState,
       bool isProcessing) errorBuilder;
 
-  const FlutterPaginatedListBuilderDevided({
+  const FlutterPaginatedListBuilder({
     super.key,
     required this.controller,
     required this.dataBuilder,
@@ -28,7 +28,7 @@ class FlutterPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
 
   @override
   Widget build(BuildContext context) {
-    return FlutterPaginatedListBuilder(
+    return _FlutterPaginatedListBuilder(
       controller: controller,
       builder: (context, state, isProcessing) => switch (state) {
         DataListPCState<ItemType, PM, ErrorType>() =>
@@ -42,7 +42,7 @@ class FlutterPaginatedListBuilderDevided<ItemType, PM extends PaginationMethod,
   }
 }
 
-class FlutterPaginatedListBuilder<ItemType, PM extends PaginationMethod,
+class _FlutterPaginatedListBuilder<ItemType, PM extends PaginationMethod,
     ErrorType> extends StatelessWidget {
   final FlutterPaginationController<ItemType, PM, ErrorType> controller;
   final Widget Function(
@@ -50,7 +50,7 @@ class FlutterPaginatedListBuilder<ItemType, PM extends PaginationMethod,
       PaginationControllerState<ItemType, PM, ErrorType> state,
       bool isProcessing) builder;
 
-  const FlutterPaginatedListBuilder({
+  const _FlutterPaginatedListBuilder({
     super.key,
     required this.controller,
     required this.builder,

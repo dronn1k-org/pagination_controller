@@ -30,7 +30,7 @@ class CubitPaginationController<ItemType, PM extends PaginationMethod,
     this.scrollController = scrollController ?? ScrollController();
     this.scrollController.addListener(_scrollListener);
 
-    if (loadFirstPageOnInit) getFirstPage();
+    if (loadFirstPageOnInit) getFirst();
   }
 
   bool _hasAlreadyInvokedByScrollController = false;
@@ -53,7 +53,7 @@ class CubitPaginationController<ItemType, PM extends PaginationMethod,
           ):
           if (!isLastPage) {
             _hasAlreadyInvokedByScrollController = true;
-            await getNextPage();
+            await getNext();
             _hasAlreadyInvokedByScrollController = false;
           }
           break;

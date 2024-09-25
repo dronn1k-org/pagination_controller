@@ -34,7 +34,7 @@ void main() {
     blocTest(
       'getFirstPage',
       build: () => controller,
-      act: (bloc) => bloc.getFirstPage(),
+      act: (bloc) => bloc.getFirst(),
       expect: () => <dynamic>[
         isA<DataListPCState<TemplateData, OffsetPagination, String>>()
             .having((s) => s.isLastItems, 'isLastPage', false)
@@ -46,8 +46,8 @@ void main() {
       'getSecondPage',
       build: () => controller,
       act: (bloc) {
-        bloc.getFirstPage();
-        bloc.getNextPage();
+        bloc.getFirst();
+        bloc.getNext();
       },
       skip: 1,
       expect: () => <dynamic>[

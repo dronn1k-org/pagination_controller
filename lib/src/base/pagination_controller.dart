@@ -20,9 +20,9 @@ abstract interface class PaginationController<ItemType,
   @protected
   set state(PaginationControllerState<ItemType, PM, ErrorType> newState);
 
-  Future<void> getFirstPage();
+  Future<void> getFirst();
 
-  Future<void> getNextPage();
+  Future<void> getNext();
 
-  Future<void> refreshCurrentList();
+  Future<void> refreshCurrent();
 }

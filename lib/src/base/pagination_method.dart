@@ -16,7 +16,7 @@ class OffsetPagination implements PaginationMethod {
   const OffsetPagination({
     required this.offset,
     this.limit = 10,
-  })  : assert(offset >= 0, 'Page number should be higher or equal than 0'),
+  })  : assert(offset >= 0, 'Offset number should be higher or equal than 0'),
         assert(limit > 0, 'Limit number should be higher than 0');
 
   @override
@@ -55,8 +55,9 @@ class PagePagination implements PaginationMethod {
       PagePagination(page: 1, limit: limit ?? this.limit);
 
   @override
-  PaginationMethod next([int? limit]) =>
-      PagePagination(page: page + 1, limit: limit ?? this.limit);
+  PaginationMethod next([int? limit]) {
+    return PagePagination(page: page + 1, limit: limit ?? this.limit);
+  }
 
   @override
   bool isLastElementList(int elementCount) => elementCount != limit;

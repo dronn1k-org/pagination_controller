@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pagination_controller/pagination_controller.dart';
-import 'package:simple_exmaple/pagination_listiner.dart';
 
 class TemplateData {
   final int index;
@@ -45,10 +44,10 @@ class _MainAppState extends State<MainApp> {
       home: Scaffold(
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () async => controller.getFirstPage(),
+            onRefresh: () async => controller.getFirst(),
             child: SingleChildScrollView(
               controller: controller.scrollController,
-              child: PaginatedDataBuilderDevided(
+              child: CubitPaginatedListBuilder(
                 controller: controller,
                 dataBuilder: (context, state, isProcessing) => Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
