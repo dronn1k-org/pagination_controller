@@ -1,12 +1,20 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:pagination_controller/src/base/pagination_method.dart';
 
+/// Base class that defines the state of the pagination controller.
+///
+/// [ItemType] is the type of items being paginated.
+/// [PM] is the pagination method used.
+/// [ErrorType] represents possible errors.
 sealed class PaginationControllerState<ItemType, PM extends PaginationMethod,
     ErrorType> {
+  /// Creates a new state with the updated pagination pointer.
   PaginationControllerState<ItemType, PM, ErrorType> copyWithPagination(
       PM pagination);
 }
 
+/// Represents a state with data in the list.
+///
+/// Contains [itemList] and the [lastPagination] pointer.
 class DataListPCState<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationControllerState<ItemType, PM, ErrorType> {
   final List<ItemType> itemList;
@@ -28,6 +36,9 @@ class DataListPCState<ItemType, PM extends PaginationMethod, ErrorType>
   }
 }
 
+/// Represents an empty list state.
+///
+/// Contains only the [lastPagination] pointer.
 class EmptyListPCState<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationControllerState<ItemType, PM, ErrorType> {
   final PM lastPagination;
@@ -44,6 +55,7 @@ class EmptyListPCState<ItemType, PM extends PaginationMethod, ErrorType>
   }
 }
 
+/// Represents an error state with an optional [description].
 class ErrorListPCState<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationControllerState<ItemType, PM, ErrorType> {
   final PM lastPagination;

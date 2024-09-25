@@ -4,8 +4,22 @@ import 'package:pagination_controller/src/base/pagination_controller_result.dart
 import 'package:pagination_controller/src/base/pagination_controller_state.dart';
 import 'package:pagination_controller/src/base/pagination_method.dart';
 
+/// Mixin that provides pagination handling logic.
+///
+/// This mixin implements the methods of [PaginationController] and provides
+/// the core logic for handling the pagination process, including fetching
+/// the first page, the next page, and refreshing the current pagination.
+///
+/// [ItemType] is the type of items being paginated.
+/// [PM] is the pagination method used, which must extend [PaginationMethod].
+/// [ErrorType] represents possible errors.
 mixin PaginationHandler<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationController<ItemType, PM, ErrorType> {
+  /// Core logic for handling pagination requests.
+  ///
+  /// [pagination] is the current pagination pointer.
+  /// [replaceOldList] determines whether the new items should replace the
+  /// current list or be appended to it. By default, it's set to false.
   @protected
   Future<PaginationControllerState<ItemType, PM, ErrorType>> handlePagination(
       PaginationMethod pagination,
@@ -82,6 +96,7 @@ mixin PaginationHandler<ItemType, PM extends PaginationMethod, ErrorType>
     }
   }
 
+  /// Fetches the first page of data.
   @override
   Future<void> getFirst() async {
     isProcessing.value = true;
@@ -89,6 +104,7 @@ mixin PaginationHandler<ItemType, PM extends PaginationMethod, ErrorType>
     isProcessing.value = false;
   }
 
+  /// Fetches the next page of data.
   @override
   Future<void> getNext() async {
     isProcessing.value = true;
@@ -104,6 +120,7 @@ mixin PaginationHandler<ItemType, PM extends PaginationMethod, ErrorType>
     isProcessing.value = false;
   }
 
+  /// Refreshes the current pagination.
   @override
   Future<void> refreshCurrent() async {
     isProcessing.value = true;

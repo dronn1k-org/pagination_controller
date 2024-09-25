@@ -1,10 +1,18 @@
+/// Abstract class that defines the pagination method interface.
+///
+/// This class provides an interface for implementing different pagination
+/// strategies such as offset-based or page-based pagination.
 abstract class PaginationMethod {
+  /// Returns the first page of pagination, optionally with a [limit] on items per page.
   PaginationMethod first([int? limit]);
 
+  /// Returns the next page of pagination, optionally with a [limit] on items per page.
   PaginationMethod next([int? limit]);
 
+  /// Retrieves all current pages.
   PaginationMethod allCurrent();
 
+  /// Checks if the last element of the list has been reached, given the [elementCount].
   bool isLastElementList(int elementCount);
 }
 
