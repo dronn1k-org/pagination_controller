@@ -39,6 +39,13 @@ class _MainAppState extends State<MainApp> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 5),
+        () => controller.updateItem(32, const TemplateData(52)));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
