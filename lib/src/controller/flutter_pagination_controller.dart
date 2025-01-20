@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:pagination_controller/src/base/callback_depth_processor.dart';
 
 import '../base/pagination_controller_base.dart';
 
@@ -10,7 +11,10 @@ import '../base/pagination_controller_base.dart';
 /// [ErrorType] defines the error type that the controller may return.
 class FlutterPaginationController<ItemType, PM extends PaginationMethod,
         ErrorType>
-    with ChangeNotifier, PaginationHandler<ItemType, PM, ErrorType>
+    with
+        ChangeNotifier,
+        PaginationHandler<ItemType, PM, ErrorType>,
+        CallbackDepthProcessor
     implements PaginationController<ItemType, PM, ErrorType> {
   /// The current state of the pagination.
   PaginationControllerState<ItemType, PM, ErrorType> _state;
@@ -57,10 +61,6 @@ class FlutterPaginationController<ItemType, PM extends PaginationMethod,
   @override
   PaginationControllerState<ItemType, PM, ErrorType> get state => _state;
 
-  /// A notifier that tracks whether a page is currently being fetched.
-  @override
-  final ValueNotifier<bool> isProcessing = ValueNotifier(false);
-
   /// A flag to prevent multiple invocations from the scroll listener.
   bool _hasAlreadyInvokedByScrollController = false;
 
@@ -89,83 +89,47 @@ class FlutterPaginationController<ItemType, PM extends PaginationMethod,
 
   /// Fetches the first page of data.
   @override
-  Future<void> getFirst() async {
-    isProcessing.value = true;
-    try {
-      _state = await handlePagination(firstPagePointer, true);
-      notifyListeners();
-    } finally {
-      isProcessing.value = false;
-    }
-  }
+  Future<void> getFirst() => process(() async {
+        _state = await handlePagination(firstPagePointer, true);
+        notifyListeners();
+      });
 
   /// Fetches the next page of data.
   @override
-  Future<void> getNext() async {
-    isProcessing.value = true;
-    try {
-      switch (state) {
-        case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-          _state = await handlePagination(lastPagination.next());
-          break;
-        case EmptyListPCState<ItemType, PM, ErrorType>():
-        case ErrorListPCState<ItemType, PM, ErrorType>():
-          _state = await handlePagination(firstPagePointer);
-          break;
-      }
+  Future<void> getNext() {
+    return process(() async {
+      _state =
+          await handlePagination(_state.nextPagination ?? firstPagePointer);
       notifyListeners();
-    } finally {
-      isProcessing.value = false;
-    }
+    });
   }
 
   /// Refreshes the current pagination.
   @override
-  Future<void> refreshCurrent() async {
-    isProcessing.value = true;
-    try {
-      switch (state) {
-        case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-          _state = (await handlePagination(lastPagination.allCurrent(), true))
-              .copyWithPagination(lastPagination);
-          break;
-        case EmptyListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        case ErrorListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-          _state = (await handlePagination(firstPagePointer, true))
-              .copyWithPagination(lastPagination);
-          break;
-      }
+  Future<void> refreshCurrent() => process(() async {
+        _state = (await handlePagination(
+                _state.refreshingPagination ?? firstPagePointer, true))
+            .copyWithPagination(_state.lastPagination);
+        notifyListeners();
+      });
+
+  @override
+  void updateItem(int index, ItemType newItem) async {
+    return process(() async {
+      _state = _state.updateItem(index, newItem);
       notifyListeners();
-    } finally {
-      isProcessing.value = false;
-    }
+    });
   }
 
   @override
-  Future<void> updateItem(int index, ItemType newItem) async {
-    isProcessing.value = true;
-    try {
-      switch (state) {
-        case DataListPCState<ItemType, PM, ErrorType>(
-            :final itemList,
-            :final isLastItems,
-            :final lastPagination
-          ):
-          final newList = [...itemList];
-          newList[index] = newItem;
-          _state = DataListPCState(
-            itemList: newList,
-            isLastItems: isLastItems,
-            lastPagination: lastPagination,
-          );
-          notifyListeners();
-          break;
-        case EmptyListPCState<ItemType, PM, ErrorType>():
-        case ErrorListPCState<ItemType, PM, ErrorType>():
-          throw Exception('State have no active list for the item updating.');
-      }
-    } finally {
-      isProcessing.value = false;
-    }
+  void removeItemAt(int index) => process(() {
+        _state = _state.removeItemAt(index);
+        notifyListeners();
+      });
+
+  @override
+  void dispose() {
+    disposeDepthProcessor();
+    super.dispose();
   }
 }
