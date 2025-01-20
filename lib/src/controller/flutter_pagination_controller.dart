@@ -91,67 +91,81 @@ class FlutterPaginationController<ItemType, PM extends PaginationMethod,
   @override
   Future<void> getFirst() async {
     isProcessing.value = true;
-    _state = await handlePagination(firstPagePointer, true);
-    isProcessing.value = false;
-    notifyListeners();
+    try {
+      _state = await handlePagination(firstPagePointer, true);
+      notifyListeners();
+    } finally {
+      isProcessing.value = false;
+    }
   }
 
   /// Fetches the next page of data.
   @override
   Future<void> getNext() async {
     isProcessing.value = true;
-    switch (state) {
-      case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        _state = await handlePagination(lastPagination.next());
-        break;
-      case EmptyListPCState<ItemType, PM, ErrorType>():
-      case ErrorListPCState<ItemType, PM, ErrorType>():
-        _state = await handlePagination(firstPagePointer);
-        break;
+    try {
+      switch (state) {
+        case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+          _state = await handlePagination(lastPagination.next());
+          break;
+        case EmptyListPCState<ItemType, PM, ErrorType>():
+        case ErrorListPCState<ItemType, PM, ErrorType>():
+          _state = await handlePagination(firstPagePointer);
+          break;
+      }
+      notifyListeners();
+    } finally {
+      isProcessing.value = false;
     }
-    isProcessing.value = false;
-    notifyListeners();
   }
 
   /// Refreshes the current pagination.
   @override
   Future<void> refreshCurrent() async {
     isProcessing.value = true;
-    switch (state) {
-      case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        _state = (await handlePagination(lastPagination.allCurrent(), true))
-            .copyWithPagination(lastPagination);
-        break;
-      case EmptyListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-      case ErrorListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        _state = (await handlePagination(firstPagePointer, true))
-            .copyWithPagination(lastPagination);
-        break;
+    try {
+      switch (state) {
+        case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+          _state = (await handlePagination(lastPagination.allCurrent(), true))
+              .copyWithPagination(lastPagination);
+          break;
+        case EmptyListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+        case ErrorListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+          _state = (await handlePagination(firstPagePointer, true))
+              .copyWithPagination(lastPagination);
+          break;
+      }
+      notifyListeners();
+    } finally {
+      isProcessing.value = false;
     }
-    isProcessing.value = false;
-    notifyListeners();
   }
 
   @override
   Future<void> updateItem(int index, ItemType newItem) async {
-    switch (state) {
-      case DataListPCState<ItemType, PM, ErrorType>(
-          :final itemList,
-          :final isLastItems,
-          :final lastPagination
-        ):
-        final newList = [...itemList];
-        newList[index] = newItem;
-        _state = DataListPCState(
-          itemList: newList,
-          isLastItems: isLastItems,
-          lastPagination: lastPagination,
-        );
-        notifyListeners();
-        break;
-      case EmptyListPCState<ItemType, PM, ErrorType>():
-      case ErrorListPCState<ItemType, PM, ErrorType>():
-        throw Exception('State have no active list for the item updating.');
+    isProcessing.value = true;
+    try {
+      switch (state) {
+        case DataListPCState<ItemType, PM, ErrorType>(
+            :final itemList,
+            :final isLastItems,
+            :final lastPagination
+          ):
+          final newList = [...itemList];
+          newList[index] = newItem;
+          _state = DataListPCState(
+            itemList: newList,
+            isLastItems: isLastItems,
+            lastPagination: lastPagination,
+          );
+          notifyListeners();
+          break;
+        case EmptyListPCState<ItemType, PM, ErrorType>():
+        case ErrorListPCState<ItemType, PM, ErrorType>():
+          throw Exception('State have no active list for the item updating.');
+      }
+    } finally {
+      isProcessing.value = false;
     }
   }
 }

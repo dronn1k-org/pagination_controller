@@ -82,42 +82,51 @@ class CubitPaginationController<ItemType, PM extends PaginationMethod,
   @override
   Future<void> getFirst() async {
     isProcessing.value = true;
-    emit(await handlePagination(firstPagePointer, true));
-    isProcessing.value = false;
+    try {
+      emit(await handlePagination(firstPagePointer, true));
+    } finally {
+      isProcessing.value = false;
+    }
   }
 
   /// Fetches the next page of data.
   @override
   Future<void> getNext() async {
     isProcessing.value = true;
-    switch (state) {
-      case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        emit(await handlePagination(lastPagination.next()));
-        break;
-      case EmptyListPCState<ItemType, PM, ErrorType>():
-      case ErrorListPCState<ItemType, PM, ErrorType>():
-        emit(await handlePagination(firstPagePointer));
-        break;
+    try {
+      switch (state) {
+        case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+          emit(await handlePagination(lastPagination.next()));
+          break;
+        case EmptyListPCState<ItemType, PM, ErrorType>():
+        case ErrorListPCState<ItemType, PM, ErrorType>():
+          emit(await handlePagination(firstPagePointer));
+          break;
+      }
+    } finally {
+      isProcessing.value = false;
     }
-    isProcessing.value = false;
   }
 
   /// Refreshes the current pagination.
   @override
   Future<void> refreshCurrent() async {
     isProcessing.value = true;
-    switch (state) {
-      case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        emit((await handlePagination(lastPagination.allCurrent(), true))
-            .copyWithPagination(lastPagination));
-        break;
-      case EmptyListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-      case ErrorListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        emit((await handlePagination(firstPagePointer, true))
-            .copyWithPagination(lastPagination));
-        break;
+    try {
+      switch (state) {
+        case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+          emit((await handlePagination(lastPagination.allCurrent(), true))
+              .copyWithPagination(lastPagination));
+          break;
+        case EmptyListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+        case ErrorListPCState<ItemType, PM, ErrorType>(:final lastPagination):
+          emit((await handlePagination(firstPagePointer, true))
+              .copyWithPagination(lastPagination));
+          break;
+      }
+    } finally {
+      isProcessing.value = false;
     }
-    isProcessing.value = false;
   }
 
   @override
