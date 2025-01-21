@@ -16,7 +16,7 @@ sealed class PaginationControllerState<ItemType, PM extends PaginationMethod,
   PM? get refreshingPagination;
   PM? get nextPagination;
 
-  PaginationControllerState<ItemType, PM, ErrorType> updateItem(
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
       int index, ItemType newItem);
   PaginationControllerState<ItemType, PM, ErrorType> removeItemAt(int index);
 }
@@ -59,7 +59,7 @@ class DataListPCState<ItemType, PM extends PaginationMethod, ErrorType>
       );
 
   @override
-  PaginationControllerState<ItemType, PM, ErrorType> updateItem(
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
           int index, ItemType newItem) =>
       DataListPCState(
         itemList: [...itemList]..[index] = newItem,
@@ -98,7 +98,7 @@ class EmptyListPCState<ItemType, PM extends PaginationMethod, ErrorType>
       this;
 
   @override
-  PaginationControllerState<ItemType, PM, ErrorType> updateItem(
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
           int index, ItemType newItem) =>
       this;
 }
@@ -134,7 +134,7 @@ class ErrorListPCState<ItemType, PM extends PaginationMethod, ErrorType>
       this;
 
   @override
-  PaginationControllerState<ItemType, PM, ErrorType> updateItem(
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
           int index, ItemType newItem) =>
       this;
 }

@@ -93,12 +93,12 @@ class CubitPaginationController<ItemType, PM extends PaginationMethod,
           .copyWithPagination(state.lastPagination)));
 
   @override
-  void updateItem(int index, ItemType newItem) =>
-      process(() => emit(state.updateItem(index, newItem)));
+  void updateItemAt(int index, ItemType newItem) =>
+      process(() async => emit(state.updateItemAt(index, newItem)));
 
   @override
   void removeItemAt(int index) =>
-      process(() => emit(state.removeItemAt(index)));
+      process(() async => emit(state.removeItemAt(index)));
 
   @override
   Future<void> close() {

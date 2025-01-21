@@ -113,16 +113,18 @@ class FlutterPaginationController<ItemType, PM extends PaginationMethod,
         notifyListeners();
       });
 
+  /// Updates an Item at the given index if DataState is provided.
   @override
-  void updateItem(int index, ItemType newItem) async {
+  void updateItemAt(int index, ItemType newItem) async {
     return process(() async {
-      _state = _state.updateItem(index, newItem);
+      _state = _state.updateItemAt(index, newItem);
       notifyListeners();
     });
   }
 
+  /// Remove an Item at the given index if DataState is provided
   @override
-  void removeItemAt(int index) => process(() {
+  void removeItemAt(int index) => process(() async {
         _state = _state.removeItemAt(index);
         notifyListeners();
       });

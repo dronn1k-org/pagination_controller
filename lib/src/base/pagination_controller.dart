@@ -38,7 +38,9 @@ abstract interface class PaginationController<ItemType,
   /// Refresh the current pagination.
   Future<void> refreshCurrent();
 
-  void updateItem(int index, ItemType newItem);
+  /// Updates an Item at the given index if DataState is provided.
+  void updateItemAt(int index, ItemType newItem);
 
+  /// Remove an Item at the given index if DataState is provided
   void removeItemAt(int index);
 }

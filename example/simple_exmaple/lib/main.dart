@@ -42,7 +42,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 5),
-        () => controller.updateItem(32, const TemplateData(52)));
+        () => controller.updateItemAt(2, const TemplateData(52)));
   }
 
   @override

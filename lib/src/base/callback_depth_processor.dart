@@ -8,13 +8,14 @@ mixin CallbackDepthProcessor {
 
   void _processingDepthListener() {
     isProcessing.value = _processingDepth.value > 0;
+    print('isProcessing.value ${isProcessing.value}');
   }
 
   @protected
-  T process<T>(T Function() cb) {
+  Future<T> process<T>(Future<T> Function() cb) async {
     _processingDepth.value += 1;
     try {
-      return cb();
+      return await cb();
     } catch (_) {
       rethrow;
     } finally {
