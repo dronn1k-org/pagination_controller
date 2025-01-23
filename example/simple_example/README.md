@@ -1,3 +1,3 @@
-# simple_exmaple
+# simple_example
 
 A new Flutter project.

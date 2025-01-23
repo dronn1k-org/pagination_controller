@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:pagination_controller/pagination_controller.dart';
 import 'package:pagination_controller/src/base/callback_depth_processor.dart';
-
-import '../base/pagination_controller_base.dart';
 
 /// A pagination controller that uses Flutter's ChangeNotifier for state management.
 ///
