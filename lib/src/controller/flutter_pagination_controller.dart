@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import '../base/pagination_controller_base.dart';
+import 'package:pagination_controller/pagination_controller.dart';
+import 'package:pagination_controller/src/base/callback_depth_processor.dart';
 
 /// A pagination controller that uses Flutter's ChangeNotifier for state management.
 ///
@@ -10,7 +10,10 @@ import '../base/pagination_controller_base.dart';
 /// [ErrorType] defines the error type that the controller may return.
 class FlutterPaginationController<ItemType, PM extends PaginationMethod,
         ErrorType>
-    with ChangeNotifier, PaginationHandler<ItemType, PM, ErrorType>
+    with
+        ChangeNotifier,
+        PaginationHandler<ItemType, PM, ErrorType>,
+        CallbackDepthProcessor
     implements PaginationController<ItemType, PM, ErrorType> {
   /// The current state of the pagination.
   PaginationControllerState<ItemType, PM, ErrorType> _state;
@@ -57,17 +60,6 @@ class FlutterPaginationController<ItemType, PM extends PaginationMethod,
   @override
   PaginationControllerState<ItemType, PM, ErrorType> get state => _state;
 
-  /// Updates the current state and notifies listeners.
-  @override
-  set state(PaginationControllerState<ItemType, PM, ErrorType> newState) {
-    _state = newState;
-    notifyListeners();
-  }
-
-  /// A notifier that tracks whether a page is currently being fetched.
-  @override
-  final ValueNotifier<bool> isProcessing = ValueNotifier(false);
-
   /// A flag to prevent multiple invocations from the scroll listener.
   bool _hasAlreadyInvokedByScrollController = false;
 
@@ -92,5 +84,53 @@ class FlutterPaginationController<ItemType, PM extends PaginationMethod,
           break;
       }
     }
+  }
+
+  /// Fetches the first page of data.
+  @override
+  Future<void> getFirst() => process(() async {
+        _state = await handlePagination(firstPagePointer, true);
+        notifyListeners();
+      });
+
+  /// Fetches the next page of data.
+  @override
+  Future<void> getNext() {
+    return process(() async {
+      _state =
+          await handlePagination(_state.nextPagination ?? firstPagePointer);
+      notifyListeners();
+    });
+  }
+
+  /// Refreshes the current pagination.
+  @override
+  Future<void> refreshCurrent() => process(() async {
+        _state = (await handlePagination(
+                _state.refreshingPagination ?? firstPagePointer, true))
+            .copyWithPagination(_state.lastPagination);
+        notifyListeners();
+      });
+
+  /// Updates an Item at the given index if DataState is provided.
+  @override
+  void updateItemAt(int index, ItemType newItem) async {
+    return process(() async {
+      _state = _state.updateItemAt(index, newItem);
+      notifyListeners();
+    });
+  }
+
+  /// Remove an Item at the given index if DataState is provided
+  @override
+  void removeItemAt(int index) => process(() async {
+        _state = _state.removeItemAt(index);
+        notifyListeners();
+      });
+
+  @override
+  void dispose() {
+    disposeDepthProcessor();
+    super.dispose();
   }
 }

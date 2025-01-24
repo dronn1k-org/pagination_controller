@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:pagination_controller/src/base/callback_depth_processor.dart';
 import 'package:pagination_controller/src/base/pagination_controller_base.dart';
 
 /// A pagination controller that uses the Bloc Cubit pattern for state management.
@@ -11,7 +12,7 @@ import 'package:pagination_controller/src/base/pagination_controller_base.dart';
 class CubitPaginationController<ItemType, PM extends PaginationMethod,
         ErrorType>
     extends Cubit<PaginationControllerState<ItemType, PM, ErrorType>>
-    with PaginationHandler<ItemType, PM, ErrorType>
+    with PaginationHandler<ItemType, PM, ErrorType>, CallbackDepthProcessor
     implements PaginationController<ItemType, PM, ErrorType> {
   /// The ScrollController used for detecting scrolling and loading new pages.
   @override
@@ -51,15 +52,6 @@ class CubitPaginationController<ItemType, PM extends PaginationMethod,
   /// A flag to prevent multiple invocations from the scroll listener.
   bool _hasAlreadyInvokedByScrollController = false;
 
-  /// Updates the current state of the controller.
-  @override
-  set state(PaginationControllerState<ItemType, PM, ErrorType> newState) =>
-      emit(newState);
-
-  /// A notifier that tracks whether a page is currently being fetched.
-  @override
-  final ValueNotifier<bool> isProcessing = ValueNotifier(false);
-
   /// Listens for scroll events and triggers loading of the next page when nearing the end of the list.
   void _scrollListener() async {
     if (_hasAlreadyInvokedByScrollController) return;
@@ -81,5 +73,36 @@ class CubitPaginationController<ItemType, PM extends PaginationMethod,
           break;
       }
     }
+  }
+
+  /// Fetches the first page of data.
+  @override
+  Future<void> getFirst() =>
+      process(() async => emit(await handlePagination(firstPagePointer, true)));
+
+  /// Fetches the next page of data.
+  @override
+  Future<void> getNext() => process(() async =>
+      emit(await handlePagination(state.nextPagination ?? firstPagePointer)));
+
+  /// Refreshes the current pagination.
+  @override
+  Future<void> refreshCurrent() async =>
+      process(() async => emit((await handlePagination(
+              state.refreshingPagination ?? firstPagePointer, true))
+          .copyWithPagination(state.lastPagination)));
+
+  @override
+  void updateItemAt(int index, ItemType newItem) =>
+      process(() async => emit(state.updateItemAt(index, newItem)));
+
+  @override
+  void removeItemAt(int index) =>
+      process(() async => emit(state.removeItemAt(index)));
+
+  @override
+  Future<void> close() {
+    disposeDepthProcessor();
+    return super.close();
   }
 }

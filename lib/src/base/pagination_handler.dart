@@ -95,46 +95,4 @@ mixin PaginationHandler<ItemType, PM extends PaginationMethod, ErrorType>
         }
     }
   }
-
-  /// Fetches the first page of data.
-  @override
-  Future<void> getFirst() async {
-    isProcessing.value = true;
-    state = await handlePagination(firstPagePointer, true);
-    isProcessing.value = false;
-  }
-
-  /// Fetches the next page of data.
-  @override
-  Future<void> getNext() async {
-    isProcessing.value = true;
-    switch (state) {
-      case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        state = await handlePagination(lastPagination.next());
-        break;
-      case EmptyListPCState<ItemType, PM, ErrorType>():
-      case ErrorListPCState<ItemType, PM, ErrorType>():
-        state = await handlePagination(firstPagePointer);
-        break;
-    }
-    isProcessing.value = false;
-  }
-
-  /// Refreshes the current pagination.
-  @override
-  Future<void> refreshCurrent() async {
-    isProcessing.value = true;
-    switch (state) {
-      case DataListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        state = (await handlePagination(lastPagination.allCurrent(), true))
-            .copyWithPagination(lastPagination);
-        break;
-      case EmptyListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-      case ErrorListPCState<ItemType, PM, ErrorType>(:final lastPagination):
-        state = (await handlePagination(firstPagePointer, true))
-            .copyWithPagination(lastPagination);
-        break;
-    }
-    isProcessing.value = false;
-  }
 }
