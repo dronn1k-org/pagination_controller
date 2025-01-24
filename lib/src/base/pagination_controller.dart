@@ -29,10 +29,6 @@ abstract interface class PaginationController<ItemType,
   /// Current state of the pagination controller.
   PaginationControllerState<ItemType, PM, ErrorType> get state;
 
-  /// Setter for the state.
-  @protected
-  set state(PaginationControllerState<ItemType, PM, ErrorType> newState);
-
   /// Fetch the first page.
   Future<void> getFirst();
 
@@ -41,4 +37,10 @@ abstract interface class PaginationController<ItemType,
 
   /// Refresh the current pagination.
   Future<void> refreshCurrent();
+
+  /// Updates an Item at the given index if DataState is provided.
+  void updateItemAt(int index, ItemType newItem);
+
+  /// Remove an Item at the given index if DataState is provided
+  void removeItemAt(int index);
 }

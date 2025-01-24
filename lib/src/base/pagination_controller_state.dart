@@ -7,9 +7,18 @@ import 'package:pagination_controller/src/base/pagination_method.dart';
 /// [ErrorType] represents possible errors.
 sealed class PaginationControllerState<ItemType, PM extends PaginationMethod,
     ErrorType> {
+  abstract final PM lastPagination;
+
   /// Creates a new state with the updated pagination pointer.
   PaginationControllerState<ItemType, PM, ErrorType> copyWithPagination(
       PM pagination);
+
+  PM? get refreshingPagination;
+  PM? get nextPagination;
+
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
+      int index, ItemType newItem);
+  PaginationControllerState<ItemType, PM, ErrorType> removeItemAt(int index);
 }
 
 /// Represents a state with data in the list.
@@ -18,6 +27,7 @@ sealed class PaginationControllerState<ItemType, PM extends PaginationMethod,
 class DataListPCState<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationControllerState<ItemType, PM, ErrorType> {
   final List<ItemType> itemList;
+  @override
   final PM lastPagination;
   final bool isLastItems;
 
@@ -28,12 +38,34 @@ class DataListPCState<ItemType, PM extends PaginationMethod, ErrorType>
   });
 
   @override
-  DataListPCState<ItemType, PM, ErrorType> copyWithPagination(PM pagination) {
-    return DataListPCState(
-        itemList: itemList,
-        lastPagination: pagination,
-        isLastItems: isLastItems);
-  }
+  PM? get nextPagination => lastPagination.next() as PM;
+
+  @override
+  PM? get refreshingPagination => lastPagination.allCurrent() as PM;
+
+  @override
+  DataListPCState<ItemType, PM, ErrorType> copyWithPagination(PM pagination) =>
+      DataListPCState(
+          itemList: itemList,
+          lastPagination: pagination,
+          isLastItems: isLastItems);
+
+  @override
+  PaginationControllerState<ItemType, PM, ErrorType> removeItemAt(int index) =>
+      DataListPCState(
+        itemList: [...itemList]..removeAt(index),
+        lastPagination: lastPagination,
+        isLastItems: isLastItems,
+      );
+
+  @override
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
+          int index, ItemType newItem) =>
+      DataListPCState(
+        itemList: [...itemList]..[index] = newItem,
+        isLastItems: isLastItems,
+        lastPagination: lastPagination,
+      );
 }
 
 /// Represents an empty list state.
@@ -41,6 +73,7 @@ class DataListPCState<ItemType, PM extends PaginationMethod, ErrorType>
 /// Contains only the [lastPagination] pointer.
 class EmptyListPCState<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationControllerState<ItemType, PM, ErrorType> {
+  @override
   final PM lastPagination;
 
   const EmptyListPCState({
@@ -53,11 +86,27 @@ class EmptyListPCState<ItemType, PM extends PaginationMethod, ErrorType>
       lastPagination: pagination,
     );
   }
+
+  @override
+  PM? get nextPagination => null;
+
+  @override
+  PM? get refreshingPagination => null;
+
+  @override
+  PaginationControllerState<ItemType, PM, ErrorType> removeItemAt(int index) =>
+      this;
+
+  @override
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
+          int index, ItemType newItem) =>
+      this;
 }
 
 /// Represents an error state with an optional [description].
 class ErrorListPCState<ItemType, PM extends PaginationMethod, ErrorType>
     implements PaginationControllerState<ItemType, PM, ErrorType> {
+  @override
   final PM lastPagination;
   final ErrorType? description;
 
@@ -73,4 +122,19 @@ class ErrorListPCState<ItemType, PM extends PaginationMethod, ErrorType>
       lastPagination: pagination,
     );
   }
+
+  @override
+  PM? get nextPagination => null;
+
+  @override
+  PM? get refreshingPagination => null;
+
+  @override
+  PaginationControllerState<ItemType, PM, ErrorType> removeItemAt(int index) =>
+      this;
+
+  @override
+  PaginationControllerState<ItemType, PM, ErrorType> updateItemAt(
+          int index, ItemType newItem) =>
+      this;
 }
