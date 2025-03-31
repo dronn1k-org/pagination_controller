@@ -6,10 +6,8 @@ mixin CallbackDepthProcessor {
   late final ValueNotifier<int> _processingDepth = ValueNotifier(0)
     ..addListener(_processingDepthListener);
 
-  void _processingDepthListener() {
-    isProcessing.value = _processingDepth.value > 0;
-    print('isProcessing.value ${isProcessing.value}');
-  }
+  void _processingDepthListener() =>
+      isProcessing.value = _processingDepth.value > 0;
 
   @protected
   Future<T> process<T>(Future<T> Function() cb) async {

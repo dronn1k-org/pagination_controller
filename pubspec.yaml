@@ -1,6 +1,6 @@
 name: pagination_controller
 description: The `pagination_controller` package provides an abstract and reusable pagination logic for Flutter applications. It supports different pagination methods such as offset-based and page-based pagination. It also integrates with `ScrollController` for automatic loading of new data as users scroll.
-version: 0.1.1
+version: 0.1.1+1
 repository: https://github.com/dronn1k-org/pagination_controller/
 issue_tracker: https://github.com/dronn1k-org/pagination_controller/issues
 
